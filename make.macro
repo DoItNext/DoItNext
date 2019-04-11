@@ -1,0 +1,58 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  Retrieve the project root folder.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+PROJECT_DIR  := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PROJECT_NAME := $(lastword $(subst /, ,$(PROJECT_DIR)))
+BIN_DIR      := $(PROJECT_DIR)bin/
+TEST_DIR     := $(PROJECT_DIR)tests/
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  Detect the current OS
+#  (https://stackoverflow.com/a/52062069/938111)
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+ifeq ('$(findstring ;,$(PATH))',';')
+    OS := Windows
+else
+    OS := $(shell uname 2>/dev/null || echo Unknown)
+    OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
+    OS := $(patsubst MSYS%,MSYS,$(detected_OS))
+    OS := $(patsubst MINGW%,MSYS,$(detected_OS))
+endif
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+#  Defines some OS specific helper macros
+#  (https://stackoverflow.com/a/30225575/11223208)
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+#  Windows without cygwin being active
+ifeq ("$(OS)","Windows")
+    mkdir   = "mkdir" -p $(strip $(subst \,/,$(1)))
+    rm      = $(wordlist 2,65535,$(foreach FILE,$(strip $(subst \,/,$(1))),& "rm" -f $(FILE) ))
+    rmdir   = "rm" -rf $(strip $(subst \,/,$(1)))
+    cp      = "cp" $(strip $(subst \,/,$(1))) $(strip $(subst \,/,$(2)))
+    cpdir   = "cp" -r $(strip $(subst \,/,$(1))) $(strip $(subst \,/,$(2)))
+    mv      = "mv" $(strip $(subst \,/,$(1))) $(strip $(subst \,/,$(2)))
+    diff    = "diff" --strip-trailing-cr -bw $(strip $(1)) $(strip $(2))
+    echo    = "echo" $(strip $(1))
+    exe     = $(strip $(1)).exe
+else
+    mkdir   = mkdir -p $(1)
+    rm      = rm $(1) > /dev/null 2>&1 || true
+    rmdir   = rm -rf $(1) > /dev/null 2>&1 || true
+    cp      = cp $(1) $(2) > /dev/null 2>&1 || true
+    cpdir   = cp -r $(1) $(2) > /dev/null 2>&1 || true
+    mv      = mv $(1) $(2) > /dev/null 2>&1 || true
+    diff    = diff --strip-trailing-cr -bw $(1) $(2)
+    echo    = echo $(1)
+    exe     = $(1)
+endif
