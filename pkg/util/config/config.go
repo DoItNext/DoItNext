@@ -17,7 +17,10 @@ type configuration struct {
 
 // Server configuration
 type server struct {
-	Port uint `valid:"port,required"`
+	Port         uint `mapstructure:"port";valid:"port,required"`
+	Debug        bool `mapstructure:"debug";valid:"required"`
+	ReadTimeout  int  `mapstructure:"read_timeout";valid:"required"`
+	WriteTimeout int  `mapstructure:"write_timeout";valid:"required"`
 }
 
 // Load loads configuration from the given list of paths and populates it into the ServerConfig variable.

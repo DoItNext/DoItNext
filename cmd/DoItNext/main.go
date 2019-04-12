@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/DoItNext/DoItNext/pkg/server"
 	"github.com/DoItNext/DoItNext/pkg/util/config"
 	"github.com/go-mods/zerolog-rotate"
 	"github.com/go-mods/zerolog-rotate/log"
+	"github.com/iancoleman/strcase"
 	"time"
 )
 
@@ -12,12 +14,22 @@ func main() {
 
 	// Create the main logger
 	log.Logger = logger.New(logger.Config{
-		RwConfig: func(rw *logger.RotateConfig) { rw.LogPath = "logs"; rw.FileName = "server" },
-		CwConfig: func(cw *logger.ConsoleConfig) { cw.TimeFormat = time.RFC3339 },
+		RwConfig: func(rw *logger.ZrRotateConfig) {
+			rw.LogPath = "logs"
+			rw.FileName = "server"
+			rw.TimeTagFormat = time.RFC3339
+		},
+		CwConfig: func(cw *logger.ZrConsoleConfig) {
+			cw.TimeFormat = time.RFC3339
+			cw.NoColor = true
+			cw.FormatLevel = func(i interface{}) string {
+				return fmt.Sprintf("| %-6s|", strcase.ToCamel(i.(string)))
+			}
+		},
 	})
 
 	// Starting the server
-	log.Info("DoItNext is starting ...")
+	log.Info("Starting ...")
 
 	// load server configurations
 	if err := config.Load("./config"); err != nil {
@@ -29,5 +41,6 @@ func main() {
 	srv.Initialize()
 	srv.Run()
 
-	log.Info("DoItNext is ending ...")
+	// That's the end of DoItNext
+	log.Info("Stopped")
 }
