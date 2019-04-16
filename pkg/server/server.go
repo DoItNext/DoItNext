@@ -7,6 +7,7 @@ import (
 	"github.com/DoItNext/DoItNext/pkg/util/database/mysql"
 	"github.com/DoItNext/DoItNext/pkg/util/middleware/logger"
 	"github.com/DoItNext/DoItNext/pkg/util/middleware/ping"
+	"github.com/DoItNext/DoItNext/pkg/util/middleware/secure"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -58,6 +59,8 @@ func (server *Server) routes() {
 		middleware.RedirectSlashes,                    // Redirect slashes to no slash URL versions
 		middleware.Recoverer,                          // Recover from panics without crashing server
 		logger.Chi,                                    // Log API request calls
+		secure.Headers,                                // General security headers for basic security measures
+		secure.CORS,                                   // Cross-Origin Resource Sharing support
 		ping.Ping,                                     // Ping heartbeat
 	)
 
