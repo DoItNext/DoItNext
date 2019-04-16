@@ -12,7 +12,8 @@ var Configuration configuration
 
 // Main configuration
 type configuration struct {
-	Server server
+	Server   server   `mapstructure:"server"`
+	Database database `mapstructure:"database"`
 }
 
 // Server configuration
@@ -21,6 +22,17 @@ type server struct {
 	Debug        bool `mapstructure:"debug";valid:"required"`
 	ReadTimeout  int  `mapstructure:"read_timeout";valid:"required"`
 	WriteTimeout int  `mapstructure:"write_timeout";valid:"required"`
+}
+
+// Database configuration
+type database struct {
+	Type     string `mapstructure:"type";valid:"in(mysql)"`
+	Host     string `mapstructure:"host";valid:"required"`
+	Port     uint   `mapstructure:"port";valid:"port,required"`
+	Name     string `mapstructure:"name";valid:"required"`
+	User     string `mapstructure:"user";valid:"required"`
+	Password string `mapstructure:"password";valid:"required"`
+	Charset  string `mapstructure:"charset";valid:"in(utf8)"`
 }
 
 // Load loads configuration from the given list of paths and populates it into the ServerConfig variable.

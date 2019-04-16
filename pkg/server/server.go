@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/DoItNext/DoItNext/pkg/util/config"
+	"github.com/DoItNext/DoItNext/pkg/util/database/mysql"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-mods/zerolog-rotate/log"
 	zrmiddleware "github.com/go-mods/zerolog-rotate/middleware"
+	"github.com/jinzhu/gorm"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,6 +20,7 @@ import (
 
 // Server configuration
 type Server struct {
+	DB *gorm.DB
 }
 
 var router = chi.NewRouter()
@@ -29,6 +32,21 @@ func (server *Server) Initialize() {
 }
 
 func (server *Server) routes() {
+	// database configuration
+	cfg := config.Configuration.Database
+
+	// Establish database connection
+	switch cfg.Type {
+	case "mysql":
+		if db, err := mysql.New(); err != nil {
+			log.Error(err, "While trying to initialise the database")
+			log.Fatal("Could not connect database")
+		} else {
+			server.DB = db
+		}
+	default:
+		log.Panic("Only mysql database is supported for the moment")
+	}
 
 	// chi middleware
 	router.Use(
@@ -66,8 +84,8 @@ func (server *Server) Run() {
 		Handler:      router,
 	}
 
-	// Wait for interrupt signal to gracefully shutdown the server with
-	// a timeout of 20 seconds.
+	// Wait for interrupt signal to gracefully shutdown the server
+	// with a timeout of 20 seconds.
 	idleConnectionClosed := make(chan struct{})
 	go func() {
 		sigint := make(chan os.Signal, 1)
