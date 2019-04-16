@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"github.com/DoItNext/DoItNext/pkg/util/config"
 	"github.com/DoItNext/DoItNext/pkg/util/database/mysql"
+	"github.com/DoItNext/DoItNext/pkg/util/middleware/logger"
+	"github.com/DoItNext/DoItNext/pkg/util/middleware/ping"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-mods/zerolog-rotate/log"
-	zrmiddleware "github.com/go-mods/zerolog-rotate/middleware"
 	"github.com/jinzhu/gorm"
 	"net/http"
 	"os"
@@ -31,6 +32,7 @@ func (server *Server) Initialize() {
 	server.routes()
 }
 
+// Create api routes
 func (server *Server) routes() {
 	// database configuration
 	cfg := config.Configuration.Database
@@ -52,18 +54,16 @@ func (server *Server) routes() {
 	router.Use(
 		render.SetContentType(render.ContentTypeJSON), // Set content-Type headers as application/json
 		middleware.RequestID,                          // Inject request ID into the context of each request
-		zrmiddleware.ChiLogger,                        // Log API request calls
 		middleware.DefaultCompress,                    // Compress results, mostly gzipping assets and json
 		middleware.RedirectSlashes,                    // Redirect slashes to no slash URL versions
 		middleware.Recoverer,                          // Recover from panics without crashing server
+		logger.Chi,                                    // Log API request calls
+		ping.Ping,                                     // Ping heartbeat
 	)
 
 	// Simple ping response
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("hi"))
-	})
-	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("pong"))
 	})
 }
 
