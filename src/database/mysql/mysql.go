@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/DoItNext/DoItNext/pkg/util/config"
+	"github.com/DoItNext/DoItNext/src/config"
 	"github.com/go-mods/wait-host"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"

@@ -3,7 +3,7 @@ include make.macro
 default: build
 
 run:
-	go run cmd/DoItNext/main.go
+	go run main.go
 
 clean:
 	@echo Cleaning project...
@@ -14,7 +14,7 @@ build: clean
 	@echo Building project...
 	@$(call mkdir, $(BIN_DIR)config)
 	@$(call cpdir, config $(BIN_DIR))
-	@go build -a -o $(call exe, $(BIN_DIR)DoItNext) cmd/DoItNext/main.go
+	@go build -a -o $(call exe, $(BIN_DIR)DoItNext) main.go
 	@echo Building project done
 
 database:

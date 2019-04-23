@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/DoItNext/DoItNext/pkg/server"
-	"github.com/DoItNext/DoItNext/pkg/util/config"
+	"github.com/DoItNext/DoItNext/src/config"
+	"github.com/DoItNext/DoItNext/src/server"
 	"github.com/go-mods/zerolog-rotate"
 	"github.com/go-mods/zerolog-rotate/log"
 	"github.com/iancoleman/strcase"
